@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gateway
+  labels:
+    app: gateway
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+      - name: gateway
+        image: trisberg/gateway:0.0.1-SNAPSHOT
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 1.0
+            memory: 1024Mi
+          requests:
+            cpu: 0.5
+            memory: 640Mi
+        livenessProbe:
+          httpGet:
+            path: /application/health
+            port: 80
+          initialDelaySeconds: 90
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /application/health
+            port: 80
+          initialDelaySeconds: 45
+          periodSeconds: 15
+          timeoutSeconds: 5
+        env:
+        - name: SERVER_PORT
+          value: '80'
+        - name: SPRING_PROFILES_ACTIVE
+          value: kubernetes

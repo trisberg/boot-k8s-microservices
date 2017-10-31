@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "hollywood.fullname" . }}-zipkin
+  labels:
+    app: {{ template "hollywood.name" . }}-zipkin
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.zipkin.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "hollywood.name" . }}-zipkin
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.zipkin.image.repository }}:{{ .Values.zipkin.image.tag }}"
+          imagePullPolicy: {{ .Values.zipkin.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.zipkin.service.internalPort }}
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          resources:
+{{ toYaml .Values.zipkin.resources | indent 12 }}
+    {{- if .Values.zipkin.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.zipkin.nodeSelector | indent 8 }}
+    {{- end }}
+ 

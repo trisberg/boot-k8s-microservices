@@ -1,0 +1,166 @@
+# boot-k8s-microservices
+
+## A Spring Boot Microservice Demo App built to run on Kubernetes. 
+
+The microservices integrate with Zipkin and Prometheus/Grafana for tracing and metrics reporting.
+The Demo can be installed using the provided link:#helm[Helm chart].
+
+### Start Minikube
+
+Install Minikube and kubectl CLI:
+
+- install Minikube from https://kubernetes.io/docs/tasks/tools/install-minikube/
+
+- install kubectl from https://kubernetes.io/docs/tasks/tools/install-kubectl/
+
+
+You need a running 1.7 Kubernetes cluster with at least 4GB of memory.
+
+----
+minikube start --memory=4096
+----
+
+
+### Building
+
+Build the three microservice apps individually:
+
+#### Actors
+
+```
+cd actors
+./mvnw clean build dockerfile:build
+cd ..
+```
+
+#### Images
+
+```
+cd images
+./mvnw clean build dockerfile:build
+cd ..
+```
+
+#### Gateway
+
+```
+cd gateway
+./mvnw clean build dockerfile:build
+cd ..
+```
+
+### Share Docker Images
+
+There are two ways you can share the docker images -- push them to Docker Hub, or build them directly using the Minikube docker environment.
+
+#### Push to Docker Hub
+
+The images are tagged using your username, so when you share them you need to have an account at Docker Hub matching your username and be logged in.
+
+```
+docker push $USER/actors:0.0.1-SNAPSHOT
+docker push $USER/images:0.0.1-SNAPSHOT
+docker push $USER/gateway:0.0.1-SNAPSHOT
+```
+
+#### Build with Minikube docker environment
+
+If you knew you wanted to use this approach you could prepare your terminal with `eval $(minikube docker-env)` before building the individual microservice apps above. If you didn't do that, then you need to build the docker image again:
+
+```
+eval $(minikube docker-env)
+cd actors
+./mvnw dockerfile:build
+cd ..
+cd images
+./mvnw dockerfile:build
+cd ..
+cd gateway
+./mvnw dockerfile:build
+cd ..
+```
+
+### [[helm]]Install using Helm chart
+
+If you built your own Docker images tagged with your username then you need to modify the `charts/hollywood/values.yaml` file. Just change `springdeveloper` to match your username. You can also install using  the `springdeveloper` tagged image repositories from link:https://hub.docker.com/r/springdeveloper/[Docker Hub].
+
+#### Install Helm client and server side components
+
+The Helm client is run on your local machine and can be installed using the instructions found here: link:https://github.com/kubernetes/helm/blob/master/README.md#install[]
+
+Once you have Helm client installed you can install the server component using:
+
+```
+helm init
+```
+
+NOTE: To verify that the Tiller pod has started execute the following command: `kubectl get pod --namespace kube-system` and you should see the tiller pod running.
+
+#### Install the microservices Hollywood Demo App
+
+To install the three microservices plus MySQL, Zipkin, Prometheus and Grafana run the following install from the root directory of the `boot-k8s-microservices` repo:
+
+```
+helm install --name demo charts/hollywood
+```
+
+### Using the demo app
+
+#### Add some data
+
+Add some actors data:
+
+```
+export ACTORS_URL="$(minikube service demo-hollywood-actors --url)"
+curl -i -X POST -H "Content-Type:application/json" -d "{  \"name\" : \"Jack Nicholson\",  \"age\" : 80 }" $ACTORS_URL/actors
+curl -i -X POST -H "Content-Type:application/json" -d "{  \"name\" : \"Al Pacino\",  \"age\" : 77 }" $ACTORS_URL/actors
+curl -i -X POST -H "Content-Type:application/json" -d "{  \"name\" : \"Meryl Streep\",  \"age\" : 68 }" $ACTORS_URL/actors
+curl -i -X POST -H "Content-Type:application/json" -d "{  \"name\" : \"Jennifer Lawrence\",  \"age\" : 26 }" $ACTORS_URL/actors
+curl -i -X POST -H "Content-Type:application/json" -d "{  \"name\" : \"Julia Roberts\",  \"age\" : 49 }" $ACTORS_URL/actors
+curl -i -X POST -H "Content-Type:application/json" -d "{  \"name\" : \"Bradley Cooper\",  \"age\" : 42 }" $ACTORS_URL/actors
+curl -i -X POST -H "Content-Type:application/json" -d "{  \"name\" : \"Dolph Lundgren\",  \"age\" : 59 }" $ACTORS_URL/actors
+```
+
+Add some images:
+
+```
+export IMAGES_URL="$(minikube service demo-hollywood-images --url)"
+curl -i -X POST -H "Content-Type:application/json" -d "{  \"url\" : \"https://www.goldenglobes.com/sites/default/files/articles/cover_images/hfpa12_p_068.jpg\", \"name\" : \"Meryl Streep\",  \"size\" : 1240510 }" $IMAGES_URL/images
+curl -i -X POST -H "Content-Type:application/json" -d "{  \"url\" : \"https://www.evolutionary.org/wp-content/uploads/2014/04/Dolph-Lundgren-boxer-197x300.jpg\", \"name\" : \"Dolph Lundgren\",  \"size\" : 13923 }" $IMAGES_URL/images
+```
+
+#### Access the Gateway API
+
+```
+export GATEWAY_URL="$(minikube service demo-hollywood-gateway --url)"
+curl $GATEWAY_URL/api/actors/Meryl%20Streep | python -m json.tool
+curl $GATEWAY_URL/api/actors/Dolph%20Lundgren | python -m json.tool
+```
+
+#### View the Zipkin traces
+
+```
+minikube service demo-hollywood-zipkin
+```
+
+#### Monitor the demo apps using Grafana
+
+##### Create the Grafana dashboard
+
+```
+./grafana-dash.sh
+```
+
+##### Open the Grafana dashboard
+
+```
+minikube service demo-hollywood-grafana
+```
+
+Then click on "Home:" and select the `Hollywood` dashboard.
+
+### Have fun cloning and modifying the code in this project
+
+If you have some fixes or ideas for improvementa please create an issue or a PR against this project.
+
+

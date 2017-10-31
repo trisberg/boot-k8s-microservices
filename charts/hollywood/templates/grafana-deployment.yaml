@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "hollywood.fullname" . }}-grafana
+  labels:
+    app: {{ template "hollywood.name" . }}
+    component: grafana
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.grafana.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "hollywood.name" . }}
+        component: grafana
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-grafana
+          image: "{{ .Values.grafana.image.repository }}:{{ .Values.grafana.image.tag }}"
+          imagePullPolicy: {{ .Values.grafana.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.grafana.service.internalPort }}
+          env:
+          - name: GRAFANA_PORT
+            value: "3000"
+          - name: GF_AUTH_BASIC_ENABLED
+            value: "false"
+          - name: GF_AUTH_ANONYMOUS_ENABLED
+            value: "true"
+          - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+            value: Admin
+          - name: GF_PATHS_DATA
+            value: /data/grafana
+          volumeMounts:
+          - mountPath: /data/grafana
+            name: grafana-data
+          resources:
+{{ toYaml .Values.grafana.resources | indent 12 }}
+      volumes:
+        - name: grafana-data
+          emptyDir: {}
+    {{- if .Values.grafana.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.grafana.nodeSelector | indent 8 }}
+    {{- end }}

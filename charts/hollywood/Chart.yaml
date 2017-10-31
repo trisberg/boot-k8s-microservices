@@ -1,0 +1,11 @@
+apiVersion: v1
+description: A Helm chart for Spring Boot Demo App on Kubernetes
+name: hollywood
+version: 0.1.0
+home: https://github.com/trisberg/boot-k8s-microservices
+sources:
+- https://github.com/trisberg/boot-k8s-microservices
+icon: https://raw.githubusercontent.com/trisberg/images/master/spring-boot-project-logo.png
+maintainers:
+- name: Thomas Risberg
+  email: trisberg@pivotal.io

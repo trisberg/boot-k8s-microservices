@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "hollywood.fullname" . }}-images
+  labels:
+    app: {{ template "hollywood.name" . }}-images
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.images.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "hollywood.name" . }}-images
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.images.image.repository }}:{{ .Values.images.image.tag }}"
+          imagePullPolicy: {{ .Values.images.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.images.service.internalPort }}
+          livenessProbe:
+            httpGet:
+              path: /application/status
+              port: {{ .Values.images.service.internalPort }}
+            initialDelaySeconds: 90
+            periodSeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /application/status
+              port: {{ .Values.images.service.internalPort }}
+            initialDelaySeconds: 45
+            periodSeconds: 15
+            timeoutSeconds: 5
+          env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: kubernetes
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-mysql
+                key: mysql-root-password
+          volumeMounts:
+          - name: application-config 
+            mountPath: "/config" 
+            readOnly: true
+          resources:
+{{ toYaml .Values.images.resources | indent 12 }}
+      volumes:
+      - name: application-config
+        configMap:
+          name: {{ template "hollywood.fullname" . }}-images 
+          items:
+          - key: application.yaml 
+            path: application-kubernetes.yaml
+    {{- if .Values.images.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.images.nodeSelector | indent 8 }}
+    {{- end }}
+ 

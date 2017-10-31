@@ -1,0 +1,150 @@
+# Default values for hollywood.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+actors:
+  replicaCount: 1
+  image:
+    repository: springdeveloper/actors
+    tag: 0.0.1-SNAPSHOT
+    pullPolicy: IfNotPresent
+  service:
+    name: http
+    type: NodePort
+    externalPort: 80
+    internalPort: 8080
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    # requests:
+    #  cpu: 100m
+    #  memory: 128Mi
+images:
+  replicaCount: 1
+  image:
+    repository: springdeveloper/images  
+    tag: 0.0.1-SNAPSHOT
+    pullPolicy: IfNotPresent
+  service:
+    name: http
+    type: NodePort
+    externalPort: 80
+    internalPort: 8080
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    # requests:
+    #  cpu: 100m
+    #  memory: 128Mi
+gateway:
+  replicaCount: 1
+  image:
+    repository: springdeveloper/gateway
+    tag: 0.0.1-SNAPSHOT
+    pullPolicy: IfNotPresent
+  service:
+    name: http
+    type: NodePort
+    externalPort: 80
+    internalPort: 8080
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    # requests:
+    #  cpu: 100m
+    #  memory: 128Mi
+zipkin:
+  replicaCount: 1
+  image:
+    repository: openzipkin/zipkin
+    tag: 2.2
+    pullPolicy: IfNotPresent
+  service:
+    name: http
+    type: NodePort
+    externalPort: 9411
+    internalPort: 9411
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    # requests:
+    #  cpu: 100m
+    #  memory: 128Mi
+grafana:
+  replicaCount: 1
+  image:
+    repository: grafana/grafana
+    tag: 4.4.1
+    pullPolicy: IfNotPresent
+  service:
+    name: prometheus
+    type: NodePort
+    externalPort: 3000
+    internalPort: 3000
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    # requests:
+    #  cpu: 100m
+    #  memory: 128Mi
+prometheus:
+  replicaCount: 1
+  image:
+    repository: prom/prometheus
+    tag: v1.7.1
+    pullPolicy: IfNotPresent
+  service:
+    name: prometheus
+    type: NodePort
+    externalPort: 9090
+    internalPort: 9090
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    # requests:
+    #  cpu: 100m
+    #  memory: 128Mi
+ingress:
+  enabled: false
+  # Used to create an Ingress record.
+  hosts:
+    - chart-example.local
+  annotations:
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  tls:
+    # Secrets must be manually created in the namespace.
+    # - secretName: chart-example-tls
+    #   hosts:
+    #     - chart-example.local
+mysql:
+  mysqlRootPassword: testing

@@ -1,0 +1,53 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "hollywood.fullname" . }}-gateway
+  labels:
+    app: {{ template "hollywood.name" . }}-gateway
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.gateway.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "hollywood.name" . }}-gateway
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag }}"
+          imagePullPolicy: {{ .Values.gateway.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.gateway.service.internalPort }}
+          livenessProbe:
+            httpGet:
+              path: /application/status
+              port: {{ .Values.gateway.service.internalPort }}
+            initialDelaySeconds: 90
+            periodSeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /application/status
+              port: {{ .Values.gateway.service.internalPort }}
+            initialDelaySeconds: 45
+            periodSeconds: 15
+            timeoutSeconds: 5
+          env:
+          - name: SPRING_PROFILES_ACTIVE
+            value: kubernetes
+          - name: SPRING_ZIPKIN_BASEURL
+            value: http://{{ template "hollywood.fullname" . }}-zipkin:{{ .Values.zipkin.service.externalPort }}
+          - name: ACTORS_SERVICE_URL
+            value: http://{{ template "hollywood.fullname" . }}-actors/actors
+          - name: IMAGES_SERVICE_URL
+            value: http://{{ template "hollywood.fullname" . }}-images/images
+          resources:
+{{ toYaml .Values.gateway.resources | indent 12 }}
+    {{- if .Values.gateway.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.gateway.nodeSelector | indent 8 }}
+    {{- end }}
+ 

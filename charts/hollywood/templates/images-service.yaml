@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "hollywood.fullname" . }}-images
+  labels:
+    app: {{ template "hollywood.name" . }}-images
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.images.service.type }}
+  ports:
+    - port: {{ .Values.images.service.externalPort }}
+      targetPort: {{ .Values.images.service.internalPort }}
+      protocol: TCP
+      name: {{ .Values.images.service.name }}
+  selector:
+    app: {{ template "hollywood.name" . }}-images
+    release: {{ .Release.Name }}
