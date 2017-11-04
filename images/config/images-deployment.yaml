@@ -58,4 +58,4 @@ spec:
           name: images
           items:
           - key: application.yaml
-            path: application.yaml
+            path: application-kubernetes.yaml
