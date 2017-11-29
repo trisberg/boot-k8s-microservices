@@ -29,7 +29,7 @@ Build the three microservice apps individually:
 
 ```
 cd actors
-./mvnw clean build dockerfile:build
+./mvnw clean package dockerfile:build
 cd ..
 ```
 
@@ -37,7 +37,7 @@ cd ..
 
 ```
 cd images
-./mvnw clean build dockerfile:build
+./mvnw clean package dockerfile:build
 cd ..
 ```
 
@@ -45,7 +45,7 @@ cd ..
 
 ```
 cd gateway
-./mvnw clean build dockerfile:build
+./mvnw clean package dockerfile:build
 cd ..
 ```
 
