@@ -57,7 +57,7 @@
       "height": 68,
       "panels": [
         {
-          "content": "# Devoxx Belgium 2017",
+          "content": "# SpringOne Platform 2017",
           "id": 3,
           "links": [],
           "mode": "markdown",
@@ -76,7 +76,7 @@
           ],
           "datasource": "${DS_PROM}",
           "decimals": 0,
-          "format": "ms",
+          "format": "s",
           "gauge": {
             "maxValue": 100,
             "minValue": 0,
@@ -122,7 +122,7 @@
           "tableColumn": "__name__",
           "targets": [
             {
-              "expr": "uptime",
+              "expr": "process_uptime_seconds{instance=\"demo-hollywood-gateway:80\",job=\"hollywood\"}",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
@@ -199,7 +199,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "JVM Heap",
+          "title": "JVM Heap PS Eden Space",
           "tooltip": {
             "shared": true,
             "sort": 0,

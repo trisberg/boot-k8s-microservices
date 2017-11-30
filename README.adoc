@@ -25,11 +25,21 @@ minikube start --memory=4096
 
 Build the three microservice apps individually:
 
+[NOTE]
+====
+If you use Minikube then you can use the Minikube's Docker environment to avoid pushing your images to DockerHub. Run the following command in the terminal where you will be doing the build:
+
+```
+eval $(minikube docker-env)
+```
+
+====
+
 #### Actors
 
 ```
 cd actors
-./mvnw clean build dockerfile:build
+./mvnw clean package dockerfile:build
 cd ..
 ```
 
@@ -37,7 +47,7 @@ cd ..
 
 ```
 cd images
-./mvnw clean build dockerfile:build
+./mvnw clean package dockerfile:build
 cd ..
 ```
 
@@ -45,15 +55,17 @@ cd ..
 
 ```
 cd gateway
-./mvnw clean build dockerfile:build
+./mvnw clean package dockerfile:build
 cd ..
 ```
 
 ### Share Docker Images
 
-There are two ways you can share the docker images -- push them to Docker Hub, or build them directly using the Minikube docker environment.
+There are two ways you can use the docker images for a deployment -- push them to Docker Hub, or build them directly using the Minikube docker environment.
 
 #### Push to Docker Hub
+
+NOTE: If you used the Minikube's Docker environment you can skip this step.
 
 The images are tagged using your username, so when you share them you need to have an account at Docker Hub matching your username and be logged in.
 
@@ -61,23 +73,6 @@ The images are tagged using your username, so when you share them you need to ha
 docker push $USER/actors:0.0.1-SNAPSHOT
 docker push $USER/images:0.0.1-SNAPSHOT
 docker push $USER/gateway:0.0.1-SNAPSHOT
-```
-
-#### Build with Minikube docker environment
-
-If you knew you wanted to use this approach you could prepare your terminal with `eval $(minikube docker-env)` before building the individual microservice apps above. If you didn't do that, then you need to build the docker image again:
-
-```
-eval $(minikube docker-env)
-cd actors
-./mvnw dockerfile:build
-cd ..
-cd images
-./mvnw dockerfile:build
-cd ..
-cd gateway
-./mvnw dockerfile:build
-cd ..
 ```
 
 ### [[helm]]Install using Helm chart
@@ -94,7 +89,7 @@ Once you have Helm client installed you can install the server component using:
 helm init
 ```
 
-NOTE: To verify that the Tiller pod has started execute the following command: `kubectl get pod --namespace kube-system` and you should see the tiller pod running.
+NOTE: To verify that the Tiller pod has started execute the following command: `kubectl get pod --namespace kube-system -l app=helm` and you should see the tiller pod running.
 
 #### Install the microservices Hollywood Demo App
 

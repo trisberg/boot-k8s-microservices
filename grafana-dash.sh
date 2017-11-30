@@ -7,7 +7,7 @@ curl -sf -X POST -H "Content-Type: application/json" --data-binary "{\"name\":\"
 echo ""
 echo "Creating Dashboard"
 echo '{"dashboard": ' > data.json
-cat Hollywood-Devoxx-2017.json >> data.json
+cat Hollywood-SpringOne-2017.json >> data.json
 echo ', "inputs": [{"name": "DS_PROM", "label": "prom", "description": "", "type": "datasource", "pluginId": "prometheus", "pluginName": "Prometheus" }], "overwrite": true}' >> data.json
 curl -sf -X POST -H "Content-Type: application/json" --data-binary @data.json http://$NODE_IP:$GRAFANA_PORT/api/dashboards/import
 echo ""

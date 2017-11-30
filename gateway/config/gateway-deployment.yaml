@@ -26,14 +26,14 @@ spec:
             memory: 640Mi
         livenessProbe:
           httpGet:
-            path: /application/health
+            path: /application/status
             port: 80
           initialDelaySeconds: 90
           periodSeconds: 15
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /application/health
+            path: /application/status
             port: 80
           initialDelaySeconds: 45
           periodSeconds: 15
