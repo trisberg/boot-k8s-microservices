@@ -96,6 +96,7 @@ NOTE: To verify that the Tiller pod has started execute the following command: `
 To install the three microservices plus MySQL, Zipkin, Prometheus and Grafana run the following install from the root directory of the `boot-k8s-microservices` repo:
 
 ```
+helm dependencies update charts/hollywood
 helm install --name demo charts/hollywood
 ```
 
